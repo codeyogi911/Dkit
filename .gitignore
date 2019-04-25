@@ -1,0 +1,6 @@
+#Ignoring datasets
+datasets/
+logs/
+
+#Ignoring coco weights
+mask_rcnn_coco.h5
