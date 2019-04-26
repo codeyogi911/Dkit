@@ -69,7 +69,7 @@ class DkitConfig(Config):
     IMAGES_PER_GPU = 2
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 2  # Background + surgical items
+    NUM_CLASSES = 1 + 3  # Background + surgical items
 
     # Number of training steps per epoch
     STEPS_PER_EPOCH = 100
