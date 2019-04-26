@@ -69,7 +69,7 @@ class DkitConfig(Config):
     IMAGES_PER_GPU = 2
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 1  # Background + surgical items
+    NUM_CLASSES = 1 + 2  # Background + surgical items
 
     # Number of training steps per epoch
     STEPS_PER_EPOCH = 100
@@ -89,9 +89,11 @@ class DkitDataset(utils.Dataset):
         dataset_dir: Root directory of the dataset.
         subset: Subset to load: train or val
         """
-        # Add classes. We have only one class to add.
-        self.add_class("dkit", 1, "drillmachine")
-
+        # Add classes.
+        self.add_class("dkit", 1, "Drill")
+        self.add_class("dkit", 2, "Screw")
+        self.add_class("dkit", 3, "Charger")
+        
         # Train or validation dataset?
         assert subset in ["train", "val"]
         dataset_dir = os.path.join(dataset_dir, subset)
@@ -129,7 +131,7 @@ class DkitDataset(utils.Dataset):
                 polygons = [r['shape_attributes'] for r in a['regions'].values()]
             else:
                 polygons = [r['shape_attributes'] for r in a['regions']]
-
+                regions = [r['region_attributes'] for r in a['regions']]
             # load_mask() needs the image size to convert polygons to masks.
             # Unfortunately, VIA doesn't include it in JSON, so we must read
             # the image. This is only managable since the dataset is tiny.
@@ -142,7 +144,7 @@ class DkitDataset(utils.Dataset):
                 image_id=a['filename'],  # use file name as a unique image id
                 path=image_path,
                 width=width, height=height,
-                polygons=polygons)
+                polygons=polygons, regions=regions)
 
     def load_mask(self, image_id):
         """Generate instance masks for an image.
@@ -173,7 +175,10 @@ class DkitDataset(utils.Dataset):
 
         # Return mask, and array of class IDs of each instance. Since we have
         # one class ID only, we return an array of 1s
-        return mask.astype(np.bool), np.ones([mask.shape[-1]], dtype=np.int32)
+        classes = [r['name'] for r in self.class_info]
+#         print(region["name"] for region in info["regions"])
+        class_ids = np.array([classes.index(region["name"]) for region in info["regions"]])
+        return mask.astype(np.bool), class_ids.astype(np.int32)
 
     def image_reference(self, image_id):
         """Return the path of the image."""
