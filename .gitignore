@@ -4,5 +4,7 @@ logs/
 mask_rcnn.egg-info/
 dist/
 build/
+.vscode/
 #Ignoring coco weights
 mask_rcnn_coco.h5
+.vscode/settings.json
