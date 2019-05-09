@@ -5,6 +5,7 @@ mask_rcnn.egg-info/
 dist/
 build/
 .vscode/
+models/
 #Ignoring coco weights
 mask_rcnn_coco.h5
 .vscode/settings.json
