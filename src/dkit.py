@@ -69,7 +69,7 @@ class DkitConfig(Config):
     IMAGES_PER_GPU = 2
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 4  # Background + surgical items
+    NUM_CLASSES = 1 + 5  # Background + surgical items
 
     # Number of training steps per epoch
     STEPS_PER_EPOCH = 100
@@ -94,6 +94,7 @@ class DkitDataset(utils.Dataset):
         self.add_class("dkit", 2, "Screw")
         self.add_class("dkit", 3, "Charger")
         self.add_class("dkit", 4, "Bit 1")
+        self.add_class("dkit", 5, "Bit 8")
         # Train or validation dataset?
         assert subset in ["train", "val"]
         dataset_dir = os.path.join(dataset_dir, subset)
