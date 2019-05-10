@@ -1,8 +1,8 @@
 if [ -d "../datasets" ]
 then
-    aws s3 sync ../datasets s3://dkitdatasets && \
+    aws s3 sync ../datasets s3://dkitdatasets
 else
-    aws s3 sync s3://dkitdatasets ../datasets && \
+    aws s3 sync s3://dkitdatasets ../datasets
 fi
 # aws s3 sync ../datasets s3://dkitdatasets && \
 # Create new ec2 machine
