@@ -2,7 +2,7 @@
 Mask R-CNN
 Train on the BIT Dkit dataset and implement Medical Kit detection.
 
-Copyright (c) 2019 BIT Consulting Pte Ltd.
+Copyright (c) 2019 BIT Consulting Asia Pte Ltd.
 Licensed under the MIT License (see LICENSE for details)
 Written by Shashwat Jain
 
