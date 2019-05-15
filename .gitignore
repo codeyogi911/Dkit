@@ -12,9 +12,10 @@ mask_rcnn_coco.h5
 *.code-workspace
 
 # Byte-compiled / optimized / DLL files
-__pycache__/
+*/__pycache__/
 *.py[cod]
 *$py.class
+*.pyc
 
 # C extensions
 *.so
@@ -134,3 +135,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+src/__pycache__/dkit.cpython-36.pyc
