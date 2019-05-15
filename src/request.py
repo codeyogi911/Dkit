@@ -14,6 +14,7 @@ import glob
 # image path
 KERAS_REST_API_URL = "http://localhost:5000/detect"
 IMAGE_PATHS = glob.glob("../datasets/IKEA_FIXA/val/*.jpeg")
+IMAGE_PATHS.extend(glob.glob("../datasets/IKEA_FIXA/val/*.jpg"))
 # for filename in f:
 # 	path = "../datasets/IKEA_FIXA/val/" + filename
 # 	IMAGE_PATHS.append(path)
