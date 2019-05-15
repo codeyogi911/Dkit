@@ -3,7 +3,7 @@ import sys
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../")
 sys.path.append(ROOT_DIR)
-
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
 import flask
 from flask import Flask
 import tensorflow as tf
@@ -19,6 +19,7 @@ from keras.applications import imagenet_utils
 
 app = Flask(__name__)
 model = None
+graph = None
 
 config = dkit.DkitConfig()
     # Override the training configurations with a few
@@ -27,9 +28,10 @@ class InferenceConfig(config.__class__):
     # Run detection on one image at a time
     GPU_COUNT = 1
     IMAGES_PER_GPU = 1
+    USE_MINI_MASK = False
 
-    config = InferenceConfig()
-    # config.display()
+config = InferenceConfig()
+config.display()
 
 MODEL_DIR = os.path.join(ROOT_DIR, "logs")
 DEVICE = "/gpu:0"
@@ -46,13 +48,15 @@ def load_model():
     # Load weights
     print("Loading weights ", weights_path)
     model.load_weights(weights_path, by_name=True)
+    global graph
+    graph = tf.get_default_graph()
 
 
 def prepare_image(image, target):
     # if the image mode is not RGB, convert it
     if image.mode != "RGB":
         image = image.convert("RGB")
-
+    image = img_to_array(image)
     # resize the input image and preprocess it
     image, window, scale, padding, crop = utils.resize_image(
         image,
@@ -60,7 +64,7 @@ def prepare_image(image, target):
         min_scale=config.IMAGE_MIN_SCALE,
         max_dim=config.IMAGE_MAX_DIM,
         mode=config.IMAGE_RESIZE_MODE)
-    image = img_to_array(image)
+    
     # image = np.expand_dims(image, axis=0)
     # image = imagenet_utils.preprocess_input(image)
 
@@ -86,15 +90,17 @@ def detect():
 
             # classify the input image and then initialize the list
             # of detections to return to the client
-            results = model.detect([image], verbose=1)
+            with graph.as_default():
+                results = model.detect([image], verbose=1)
             data["detections"] = []
 
             # loop over the results and add them to the list of
             # returned detections
-            # for (rois, class_ids, masks, scores) in results[0]:
-            #     r = {"rois": rois, "probability": float(scores)}
-            #     data["detections"].append(r)
-
+            # for class_id in results[0]["class_ids"]:
+            #     r = {"class_ids": class_id}
+            data["detections"] = results[0]["class_ids"].tolist()
+            # app.logger.debug(results[0]["class_ids"])
+            # data["detections"] = results[0]["class_ids"]
             # indicate that the request was a success
             data["success"] = True
 
