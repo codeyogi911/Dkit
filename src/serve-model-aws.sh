@@ -1,4 +1,5 @@
-docker-machine ssh dkit-trainer -L localhost:5000:dkit-trainer:5000 << EOF
+docker-machine start dkit-detector
+docker-machine ssh dkit-detector -L localhost:5000:localhost:5000 << EOF
 cd Dkit/src && \
 source activate tensorflow_p36 && \
 aws s3 sync s3://dkitmodels-sg ../models && \
