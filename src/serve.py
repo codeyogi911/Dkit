@@ -44,7 +44,7 @@ def load_model():
     with tf.device(DEVICE):
         model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR,
                               config=config)
-    weights_path = "../models/mask_rcnn_dkit_coco_latest.h5"
+    weights_path = "../models/mask_rcnn_dkit_coco_latest_r50.h5"
     # Load weights
     print("Loading weights ", weights_path)
     model.load_weights(weights_path, by_name=True)
