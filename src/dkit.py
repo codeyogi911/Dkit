@@ -73,12 +73,10 @@ class DkitConfig(Config):
     NUM_CLASSES = 1 + 6  # Background + surgical items
 
     # Number of training steps per epoch
-    STEPS_PER_EPOCH = 100
+    STEPS_PER_EPOCH = 52
 
     # Skip detections with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.9
-    LEARNING_RATE = 0.001
-    MAX_GT_INSTANCES = 50
     BACKBONE = "resnet50"
 
 
