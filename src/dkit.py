@@ -82,6 +82,7 @@ class DkitConfig(Config):
     IMAGE_MAX_DIM = 512
 
     IMAGE_MIN_DIM = 400
+    BACKBONE = "resnet50"
 
 
 
