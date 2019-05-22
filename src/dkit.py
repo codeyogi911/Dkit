@@ -67,7 +67,7 @@ class DkitConfig(Config):
 
     # We use a GPU with 12GB memory, which can fit two images.
     # Adjust down if you use a smaller GPU.
-    IMAGES_PER_GPU = 2
+    IMAGES_PER_GPU = 4
 
     # Number of classes (including background)
     NUM_CLASSES = 1 + 6  # Background + surgical items
@@ -77,7 +77,13 @@ class DkitConfig(Config):
 
     # Skip detections with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.9
-    BACKBONE = "resnet50"
+
+    # Reduce the image Size
+    IMAGE_MAX_DIM = 512
+
+    IMAGE_MIN_DIM = 400
+
+
 
 
 
@@ -214,10 +220,11 @@ def train(model):
     print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=35,
+                epochs=30,
                 layers='heads',
                 augmentation = imgaug.augmenters.Sometimes(0.5, [
                     imgaug.augmenters.Fliplr(0.5),
+                    imgaug.augmenters.Flipud(0.5),
                     imgaug.augmenters.GaussianBlur(sigma=(0.0, 5.0))
                 ]))
 
