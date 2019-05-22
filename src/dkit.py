@@ -83,6 +83,9 @@ class DkitConfig(Config):
 
     IMAGE_MIN_DIM = 400
 
+    LEARNING_RATE = 0.005
+
+
 
 
 
