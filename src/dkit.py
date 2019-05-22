@@ -67,7 +67,7 @@ class DkitConfig(Config):
 
     # We use a GPU with 12GB memory, which can fit two images.
     # Adjust down if you use a smaller GPU.
-    IMAGES_PER_GPU = 4
+    IMAGES_PER_GPU = 2
 
     # Number of classes (including background)
     NUM_CLASSES = 1 + 6  # Background + surgical items
@@ -82,8 +82,6 @@ class DkitConfig(Config):
     IMAGE_MAX_DIM = 512
 
     IMAGE_MIN_DIM = 400
-    BACKBONE = "resnet50"
-
 
 
 
