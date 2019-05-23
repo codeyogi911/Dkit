@@ -78,13 +78,6 @@ class DkitConfig(Config):
     # Skip detections with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.9
 
-    # Reduce the image Size
-    IMAGE_MAX_DIM = 512
-
-    IMAGE_MIN_DIM = 400
-
-    LEARNING_RATE = 0.005
-
 
 
 
