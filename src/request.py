@@ -66,13 +66,13 @@ for path in IMAGE_PATHS:
 	# image = open(path, "rb").read()
 	print("Preparing Image...")
 	# image = Image.open(io.BytesIO(image))
-	image = Image.open(path)
+	# image = Image.open(path)
 	# image = prepare_image(image, target=(1024, 1024))
-	payload = {"image": img_to_array(image).tolist()}
+	payload = {"image": open(path, 'rb')}
 	end = time.time()
 	print("Ready to send Image... Time : {}".format(end-start))
 	# submit the request
-	r = requests.post(KERAS_REST_API_URL,json=payload).json()
+	r = requests.post(KERAS_REST_API_URL,files=payload).json()
 	end = time.time()
 	# ensure the request was sucessful
 	if r["success"]:

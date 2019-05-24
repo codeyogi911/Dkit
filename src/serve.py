@@ -80,7 +80,7 @@ def detect():
     # ensure an image was properly uploaded to our endpoint
     if flask.request.method == "POST":
         # if flask.request.files.get("image"):
-        image = flask.request.json["image"]
+        image = flask.request.files.get("image")
             # print(image)
             # image = Image.open(io.BytesIO(image))
 
@@ -90,7 +90,7 @@ def detect():
             # classify the input image and then initialize the list
             # of detections to return to the client
         with graph.as_default():
-            results = model.detect([np.asarray(image, dtype=np.float32)], verbose=1)
+            results = model.detect([img_to_array(Image.open(image))], verbose=1)
         data["detections"] = []
 
             # loop over the results and add them to the list of
