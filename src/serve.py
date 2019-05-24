@@ -16,7 +16,6 @@ import io
 from keras.preprocessing.image import img_to_array
 import numpy as np
 from keras.applications import imagenet_utils
-
 app = Flask(__name__)
 model = None
 graph = None
@@ -44,7 +43,7 @@ def load_model():
     with tf.device(DEVICE):
         model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR,
                               config=config)
-    weights_path = "../models/mask_rcnn_dkit_coco_latest_r50.h5"
+    weights_path = "../models/mask_rcnn_dkit_coco_latest.h5"
     # Load weights
     print("Loading weights ", weights_path)
     model.load_weights(weights_path, by_name=True)
@@ -80,29 +79,29 @@ def detect():
 
     # ensure an image was properly uploaded to our endpoint
     if flask.request.method == "POST":
-        if flask.request.files.get("image"):
-            # read the image in PIL format
-            image = flask.request.files["image"].read()
-            image = Image.open(io.BytesIO(image))
+        # if flask.request.files.get("image"):
+        image = flask.request.json["image"]
+            # print(image)
+            # image = Image.open(io.BytesIO(image))
 
             # preprocess the image and prepare it for classification
-            image = prepare_image(image, target=(1024, 1024))
+            # image = prepare_image(image, target=(1024, 1024))
 
             # classify the input image and then initialize the list
             # of detections to return to the client
-            with graph.as_default():
-                results = model.detect([image], verbose=1)
-            data["detections"] = []
+        with graph.as_default():
+            results = model.detect([np.asarray(image, dtype=np.float32)], verbose=1)
+        data["detections"] = []
 
             # loop over the results and add them to the list of
             # returned detections
             # for class_id in results[0]["class_ids"]:
             #     r = {"class_ids": class_id}
-            data["detections"] = results[0]["class_ids"].tolist()
+        data["detections"] = results[0]["class_ids"].tolist()
             # app.logger.debug(results[0]["class_ids"])
             # data["detections"] = results[0]["class_ids"]
             # indicate that the request was a success
-            data["success"] = True
+        data["success"] = True
 
     # return the data dictionary as a JSON response
     return flask.jsonify(data)

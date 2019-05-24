@@ -2,7 +2,7 @@ docker-machine start dkit-detector
 docker-machine ssh dkit-detector -L localhost:5000:localhost:5000 << EOF
 cd Dkit/src && \
 source activate tensorflow_p36 && \
-aws s3 sync s3://dkitmodels-sg ../models && \
+aws s3 sync s3://dkitmodels-sg ../models
 python3 serve.py
 EOF
 # cd /tmp/tfserving
