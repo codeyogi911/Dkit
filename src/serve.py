@@ -11,14 +11,17 @@ from keras.preprocessing.image import img_to_array
 import io
 from PIL import Image
 from mrcnn import utils
+from mrcnn import visualize
 from src import dkit
 import base64
 import mrcnn.model as modellib
 import tensorflow as tf
 from flask import Flask
 import flask
-
-
+import mpld3
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
+import matplotlib.image as mimage
 #Custom imports
 from flask_cors import CORS
 # import h5py
@@ -58,7 +61,7 @@ def load_model():
     with tf.device(DEVICE):
         model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR,
                               config=config)
-    weights_path = "../models/mask_rcnn_dkit_coco_latest.h5"
+    weights_path = "models/mask_rcnn_dkit_coco_latest.h5"
     # Load weights
     print("Loading weights ", weights_path)
     model.load_weights(weights_path, by_name=True)
@@ -94,32 +97,24 @@ def detect():
 
     # ensure an image was properly uploaded to our endpoint
     if flask.request.method == "POST":
-        # if flask.request.files.get("image"):
-        image = flask.request.files['file']
+        image_data = flask.request.files['file']
+        image = Image.open(image_data)
+        image = image.convert("RGB")
+        image = np.array(image)
         
-        # starter = file.find(',')
-        # image_data = file[starter+1:]
-        # image_data = bytes(image_data, encoding="ascii")
-        # image = Image.open(io.BytesIO(base64.b64decode(image_data)))
-            # print(image)
-            # image = Image.open(io.BytesIO(image))
-
-            # preprocess the image and prepare it for classification
-            # image = prepare_image(image, target=(1024, 1024))
-
-            # classify the input image and then initialize the list
-            # of detections to return to the client
-        print(img_to_array(Image.open(image).convert('RGB')).shape)
         with graph.as_default():
-            results = model.detect(
-                [img_to_array(Image.open(image).convert('RGB'))], verbose=1)
+            results = model.detect([image], verbose=1)
         data["detections"] = []
-
+        r=results[0]
+        
             # loop over the results and add them to the list of
             # returned detections
             # for class_id in results[0]["class_ids"]:
             #     r = {"class_ids": class_id}
-        data["detections"] = results[0]["class_ids"].tolist()
+        data["detections"] = r["class_ids"].tolist()
+        if (len(data["detections"]) != 0):
+            masked_image = visualize.get_masked_image(image, r['rois'], r['masks'], r['class_ids'],['BG', 'Drill', 'Screw', 'Bit 1', 'Bit 8', 'Bit 2', 'Bit 6'], r['scores'])
+            data["image"] = masked_image
             # app.logger.debug(results[0]["class_ids"])
             # data["detections"] = results[0]["class_ids"]
             # indicate that the request was a success
