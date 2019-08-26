@@ -262,7 +262,8 @@ def get_masked_image(image, boxes, masks, class_ids, class_names,
             p = Polygon(verts, facecolor="none", edgecolor=color)
             ax.add_patch(p)
     buf = BytesIO()
-    fig.savefig(buf, format="png")
+    FigureCanvas(fig).print_png(buf)
+    # fig.savefig(buf, format="png")
     data = base64.b64encode(buf.getbuffer()).decode("ascii")
     return f"<img src='data:image/png;base64,{data}'/>"
     # mpld3.show(fig)
