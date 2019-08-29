@@ -18,6 +18,7 @@ import base64
 
 import numpy as np
 from skimage.measure import find_contours
+import matplotlib as mpl
 import matplotlib.image as mimage
 import matplotlib.pyplot as plt
 from matplotlib import patches,  lines
@@ -209,14 +210,20 @@ def get_masked_image(image, boxes, masks, class_ids, class_names,
     # fig, ax = plt.subplots(1, figsize=figsize)
     # Generate random colors
     colors = colors or random_colors(N)
-
+    mpl.rcParams['savefig.pad_inches'] = 0
     # Show area outside image boundaries.
     # height, width = image.shape[:2]
-    fig = Figure()
+    # sizes = np.shape(image)
+    dct = {"pad":0, "h_pad":None, "w_pad":None, "rect":None}
+    fig = Figure(tight_layout=dct)
+    # fig.set_size_inches(1. * sizes[0] / sizes[1], 1, forward = False)
     ax = fig.subplots()
     # ax.set_ylim(height + 10, -10)
     # ax.set_xlim(-10, width + 10)
-    ax.axis('off')
+    ax.set_axis_off()
+    ax.get_xaxis().set_visible(False)
+    ax.get_yaxis().set_visible(False)
+    # ax.axis('off')
     # ax.set_title(title)
     ax.imshow(image)
     masked_image = image.astype(np.uint32).copy()
@@ -265,7 +272,7 @@ def get_masked_image(image, boxes, masks, class_ids, class_names,
     FigureCanvas(fig).print_png(buf)
     # fig.savefig(buf, format="png")
     data = base64.b64encode(buf.getbuffer()).decode("ascii")
-    return f"<img src='data:image/png;base64,{data}'/>"
+    return f"<img src='data:image/png;base64,{data}' style='margin-top:1rem;'/>"
     # mpld3.show(fig)
     # return mpld3.fig_to_html(fig, d3_url="https://d3js.org/d3.v5.min.js",mpld3_url="https://mpld3.github.io/js/mpld3.v0.3.js")
 
