@@ -182,15 +182,14 @@ def train(model):
     """Train the model."""
     # Training dataset.
     dataset_train = CocoLikeDataset()
-    print(os.getcwd())
     dataset_train.load_data(os.path.join(ROOT_DIR, "datasets/ikea_drill_screw/train/coco_instances.json"),
                         os.path.join(ROOT_DIR, "datasets/ikea_drill_screw/train/images"))
     dataset_train.prepare()
 
     # Validation dataset
     dataset_val = CocoLikeDataset()
-    dataset_val.load_data('datasets/ikea_drill_screw/val/coco_instances.json',
-                      'datasets/ikea_drill_screw/val/images')
+    dataset_val.load_data(os.path.join(ROOT_DIR,'datasets/ikea_drill_screw/val/coco_instances.json'),
+                      os.path.join(ROOT_DIR, 'datasets/ikea_drill_screw/val/images'))
     dataset_val.prepare()
 
     # *** This training schedule is an example. Update to your needs ***
