@@ -12,3 +12,4 @@ for path in IMAGE_PATHS:
     with open('utilities/manifest.json', 'a') as outfile:
         outfile.write(json.dumps(data)+"\n")
         # json.dump(data, outfile)
+ 

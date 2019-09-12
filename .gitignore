@@ -1,4 +1,6 @@
 #Ignoring datasets
+utilities/outputs/
+utilities/anno/
 datasets/
 logs/
 mask_rcnn.egg-info/
