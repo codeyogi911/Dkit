@@ -182,6 +182,7 @@ def train(model):
     """Train the model."""
     # Training dataset.
     dataset_train = CocoLikeDataset()
+    print(os.getcwd())
     dataset_train.load_data(os.path.join(ROOT_DIR, "datasets/ikea_drill_screw/train/coco_instances.json"),
                         os.path.join(ROOT_DIR, "datasets/ikea_drill_screw/train/images"))
     dataset_train.prepare()
