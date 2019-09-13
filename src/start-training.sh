@@ -4,7 +4,7 @@ bash start-tensorboard.sh &
 docker-machine ssh dkit-trainer << EOF
 cd Dkit && \
 git pull && \
-aws s3 sync s3://dkitdatasets datasets/ && \
+aws s3 sync s3://dkitdatasets datasets/ --delete && \
 source activate tensorflow_p36 && \
 cd src && \
 # python3 dkit.py train --dataset=../datasets/IKEA_FIXA --weights=last
