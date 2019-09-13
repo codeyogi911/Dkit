@@ -239,7 +239,7 @@ if __name__ == '__main__':
                         metavar="path or URL to video",
                         help='Video to apply the color splash effect on')
     parser.add_argument('--layers2train', required=False,
-                        default='heads'
+                        default='heads',
                         metavar="Layers to train",
                         help="'heads' or 'all'")
     args = parser.parse_args()
