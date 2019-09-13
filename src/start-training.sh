@@ -11,7 +11,7 @@ cd src && \
 python3 coco_trainer.py train --dataset=../datasets/ikea_drill_screw --weights=coco
 var=\$(find ../logs -type f -name "mask_rcnn_dkit_0030.h5" | sort -r | head -n 1)
 # aws s3 cp "\$var" s3://dkitmodels-sg/mask_rcnn_dkit_coco_latest.h5
-aws s3 cp "\$var" s3://dkitmodels-sg/cocosynth/mask_rcnn_dkit_coco_latest.h5
+aws s3 cp "\$var" s3://dkitmodels-sg/cocosynth/mask_rcnn_dkit_cocosynth_latest.h5
 exit
 EOF
 docker-machine stop dkit-trainer
