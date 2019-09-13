@@ -39,7 +39,7 @@ import mrcnn.model as modellib
 
 # Directory to save logs and trained model
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
-
+layers2train = 'heads'
 # Local path to trained weights file
 COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 
@@ -66,7 +66,7 @@ class CocoSynthConfig(Config):
     IMAGE_MAX_DIM = 512
 
     # You can experiment with this number to see if it improves training
-    STEPS_PER_EPOCH = 200
+    STEPS_PER_EPOCH = 100
 
     # This is how often validation is run. If you are using too much hard drive space
     # on saved models (in the MODEL_DIR), try making this value larger.
@@ -200,7 +200,7 @@ def train(model):
     print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=30,
+                epochs=20,
                 layers='heads',
                 augmentation = imgaug.augmenters.Sometimes(0.5, [
                     imgaug.augmenters.Fliplr(0.5),
@@ -238,11 +238,16 @@ if __name__ == '__main__':
     parser.add_argument('--video', required=False,
                         metavar="path or URL to video",
                         help='Video to apply the color splash effect on')
+    parser.add_argument('--layers2train', required=False,
+                        default='heads'
+                        metavar="Layers to train",
+                        help="'heads' or 'all'")
     args = parser.parse_args()
-
+    
     # Validate arguments
     if args.command == "train":
         assert args.dataset, "Argument --dataset is required for training"
+        layers2train = args.layers2train.lower()
     elif args.command == "splash":
         assert args.image or args.video,\
                "Provide --image or --video to apply color splash"
