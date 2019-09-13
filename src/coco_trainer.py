@@ -82,8 +82,7 @@ class CocoSynthConfig(Config):
     POST_NMS_ROIS_INFERENCE = 500 
     POST_NMS_ROIS_TRAINING = 1000 
     
-config = CocoSynthConfig()
-config.display()
+
 
 class CocoLikeDataset(utils.Dataset):
     """ Generates a COCO-like dataset, i.e. an image dataset annotated in the style of the COCO dataset.
@@ -179,6 +178,8 @@ class CocoLikeDataset(utils.Dataset):
 
 
 def train(model):
+    config = CocoSynthConfig()
+    config.display()    
     """Train the model."""
     # Training dataset.
     dataset_train = CocoLikeDataset()

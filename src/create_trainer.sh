@@ -10,6 +10,7 @@ docker-machine create --driver amazonec2 --amazonec2-iam-instance-profile ec2-tr
 # Setup Dkit in the system
 docker-machine ssh dkit-trainer << EOF
 source activate tensorflow_p36 && pip install git+https://github.com/aleju/imgaug.git && \
+pip install mpld3 && \
 git clone https://github.com/codeyogi911/Dkit.git && \
 cd Dkit && python setup.py install && aws s3 sync s3://dkitdatasets datasets/
 EOF
