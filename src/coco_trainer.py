@@ -189,24 +189,46 @@ def train(model):
     dataset_val.load_data(os.path.join(ROOT_DIR,'datasets/ikea_drill_screw/val/coco_instances.json'),
                       os.path.join(ROOT_DIR, 'datasets/ikea_drill_screw/val/images'))
     dataset_val.prepare()
-
+    # Image Augmentation
+        # Right/Left flip 50% of the time
+    augmentation = imgaug.augmenters.Fliplr(0.5)
+    # ,augmentation = imgaug.augmenters.Sometimes(0.5, [
+                #     imgaug.augmenters.Fliplr(0.5),
+                #     imgaug.augmenters.Flipud(0.5),
+                #     imgaug.augmenters.GaussianBlur(sigma=(0.0, 5.0))
+                # ])
     model = modellib.MaskRCNN(mode="training", config=config,
                                   model_dir=args.logs)
     # *** This training schedule is an example. Update to your needs ***
     # Since we're using a very small dataset, and starting from
     # COCO trained weights, we don't need to train too long. Also,
     # no need to train all layers, just the heads should do it.
-    # print("Training network heads")
+
+    # Training - Stage 1
+    print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=30,
-                layers=layers2train
-                # ,augmentation = imgaug.augmenters.Sometimes(0.5, [
-                #     imgaug.augmenters.Fliplr(0.5),
-                #     imgaug.augmenters.Flipud(0.5),
-                #     imgaug.augmenters.GaussianBlur(sigma=(0.0, 5.0))
-                # ])
-                )
+                epochs=20,
+                layers='heads',
+                augmentation=augmentation)
+    
+    # Training - Stage 2
+    # Finetune layers from ResNet stage 4 and up
+    # print("Fine tune Resnet stage 4 and up")
+    # model.train(dataset_train, dataset_val,
+    #                 learning_rate=config.LEARNING_RATE,
+    #                 epochs=120,
+    #                 layers='4+',
+    #                 augmentation=augmentation)
+
+    # Training - Stage 3
+    # Fine tune all layers
+    print("Fine tune all layers")
+    model.train(dataset_train, dataset_val,
+                    learning_rate=config.LEARNING_RATE / 10,
+                    epochs=40,
+                    layers='all',
+                    augmentation=augmentation)
 
 
 ############################################################
