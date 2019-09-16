@@ -201,7 +201,7 @@ def train(model):
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
                 epochs=20,
-                layers='heads',
+                layers=layers2train,
                 augmentation = imgaug.augmenters.Sometimes(0.5, [
                     imgaug.augmenters.Fliplr(0.5),
                     imgaug.augmenters.Flipud(0.5),
@@ -255,6 +255,7 @@ if __name__ == '__main__':
     print("Weights: ", args.weights)
     print("Dataset: ", args.dataset)
     print("Logs: ", args.logs)
+    print("Training: ", layers2train)
 
     # Configurations
     if args.command == "train":
@@ -266,7 +267,7 @@ if __name__ == '__main__':
     #         GPU_COUNT = 1
     #         IMAGES_PER_GPU = 1
     #     config = InferenceConfig()
-    config.display()
+    # config.display()
 
     # Create model
     if args.command == "train":
