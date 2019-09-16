@@ -48,6 +48,9 @@ COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 #     utils.download_trained_weights(COCO_MODEL_PATH)
 
 class CocoSynthConfig(Config):
+    def __init__(self, num_classes):
+        self.NUM_CLASSES = num_classes
+        super().__init__()
     """Configuration for training on the box_synthetic dataset.
     Derives from the base Config class and overrides specific values.
     """
@@ -59,14 +62,14 @@ class CocoSynthConfig(Config):
     IMAGES_PER_GPU = 4
 
     # Number of classes (including background)
-    # NUM_CLASSES = 1 + 2  # background + 7 box types
+    # NUM_CLASSES = num_classes
 
     # All of our training images are 512x512
     IMAGE_MIN_DIM = 512
     IMAGE_MAX_DIM = 512
 
     # You can experiment with this number to see if it improves training
-    STEPS_PER_EPOCH = 100
+    STEPS_PER_EPOCH = 200
 
     # This is how often validation is run. If you are using too much hard drive space
     # on saved models (in the MODEL_DIR), try making this value larger.
@@ -180,21 +183,15 @@ class CocoLikeDataset(utils.Dataset):
 def train(model):
     
     """Train the model."""
-    # Training dataset.
-    dataset_train = CocoLikeDataset()
-    dataset_train.load_data(os.path.join(ROOT_DIR, "datasets/ikea_drill_screw/train/coco_instances.json"),
-                        os.path.join(ROOT_DIR, "datasets/ikea_drill_screw/train/images"))
-    dataset_train.prepare()
-
-    config = CocoSynthConfig()
-    config.NUM_CLASSES = len(dataset_train.class_names)
-    config.display()    
+        
     # Validation dataset
     dataset_val = CocoLikeDataset()
     dataset_val.load_data(os.path.join(ROOT_DIR,'datasets/ikea_drill_screw/val/coco_instances.json'),
                       os.path.join(ROOT_DIR, 'datasets/ikea_drill_screw/val/images'))
     dataset_val.prepare()
-    
+
+    model = modellib.MaskRCNN(mode="training", config=config,
+                                  model_dir=args.logs)
     # *** This training schedule is an example. Update to your needs ***
     # Since we're using a very small dataset, and starting from
     # COCO trained weights, we don't need to train too long. Also,
@@ -202,13 +199,14 @@ def train(model):
     # print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=20,
-                layers=layers2train,
-                augmentation = imgaug.augmenters.Sometimes(0.5, [
-                    imgaug.augmenters.Fliplr(0.5),
-                    imgaug.augmenters.Flipud(0.5),
-                    imgaug.augmenters.GaussianBlur(sigma=(0.0, 5.0))
-                ]))
+                epochs=30,
+                layers=layers2train
+                # ,augmentation = imgaug.augmenters.Sometimes(0.5, [
+                #     imgaug.augmenters.Fliplr(0.5),
+                #     imgaug.augmenters.Flipud(0.5),
+                #     imgaug.augmenters.GaussianBlur(sigma=(0.0, 5.0))
+                # ])
+                )
 
 
 ############################################################
@@ -261,7 +259,15 @@ if __name__ == '__main__':
 
     # Configurations
     if args.command == "train":
-        config = CocoSynthConfig()
+        # Training dataset.
+        dataset_train = CocoLikeDataset()
+        dataset_train.load_data(os.path.join(ROOT_DIR, "datasets/ikea_drill_screw/train/coco_instances.json"),
+                            os.path.join(ROOT_DIR, "datasets/ikea_drill_screw/train/images"))
+        dataset_train.prepare()
+
+        config = CocoSynthConfig(len(dataset_train.class_names))
+        config.display()
+        # config = CocoSynthConfig()
     # else:
     #     class InferenceConfig(DkitConfig):
     #         # Set batch size to 1 since we'll be running inference on
