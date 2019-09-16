@@ -1,9 +1,9 @@
 #Variables
 layers2train=$1
 
-aws s3 sync ../datasets s3://dkitdatasets && \
+aws s3 sync ../../datasets s3://dkitdatasets && \
 docker-machine start dkit-trainer
-bash start-tensorboard.sh
+# bash start-tensorboard.sh
 docker-machine ssh dkit-trainer << EOF
 cd Dkit && \
 git pull && \

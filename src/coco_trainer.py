@@ -59,7 +59,7 @@ class CocoSynthConfig(Config):
     IMAGES_PER_GPU = 4
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 2  # background + 7 box types
+    # NUM_CLASSES = 1 + 2  # background + 7 box types
 
     # All of our training images are 512x512
     IMAGE_MIN_DIM = 512
@@ -178,8 +178,7 @@ class CocoLikeDataset(utils.Dataset):
 
 
 def train(model):
-    config = CocoSynthConfig()
-    config.display()    
+    
     """Train the model."""
     # Training dataset.
     dataset_train = CocoLikeDataset()
@@ -187,17 +186,20 @@ def train(model):
                         os.path.join(ROOT_DIR, "datasets/ikea_drill_screw/train/images"))
     dataset_train.prepare()
 
+    config = CocoSynthConfig()
+    config.NUM_CLASSES = len(dataset_train.class_names)
+    config.display()    
     # Validation dataset
     dataset_val = CocoLikeDataset()
     dataset_val.load_data(os.path.join(ROOT_DIR,'datasets/ikea_drill_screw/val/coco_instances.json'),
                       os.path.join(ROOT_DIR, 'datasets/ikea_drill_screw/val/images'))
     dataset_val.prepare()
-
+    
     # *** This training schedule is an example. Update to your needs ***
     # Since we're using a very small dataset, and starting from
     # COCO trained weights, we don't need to train too long. Also,
     # no need to train all layers, just the heads should do it.
-    print("Training network heads")
+    # print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
                 epochs=20,
