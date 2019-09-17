@@ -208,7 +208,7 @@ def train(model):
     print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=20,
+                epochs=30,
                 layers='heads',
                 augmentation=augmentation)
     
@@ -226,7 +226,7 @@ def train(model):
     print("Fine tune all layers")
     model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE / 10,
-                    epochs=40,
+                    epochs=50,
                     layers='all',
                     augmentation=augmentation)
 
