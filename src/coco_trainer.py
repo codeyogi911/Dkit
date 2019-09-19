@@ -18,6 +18,10 @@
 #     python3 balloon.py splash --weights=last --video=<URL or path to file>
 
 
+import mrcnn.model as modellib
+from mrcnn import visualize
+import mrcnn.utils as utils
+from mrcnn.config import Config
 import os
 import sys
 import json
@@ -28,14 +32,11 @@ from pathlib import Path
 import imgaug
 # Set the ROOT_DIR variable to the root directory of the Mask_RCNN git repo
 ROOT_DIR = '../'
-assert os.path.exists(ROOT_DIR), 'ROOT_DIR does not exist. Did you forget to read the instructions above? ;)'
+assert os.path.exists(
+    ROOT_DIR), 'ROOT_DIR does not exist. Did you forget to read the instructions above? ;)'
 
 # Import mrcnn libraries
-sys.path.append(ROOT_DIR) 
-from mrcnn.config import Config
-import mrcnn.utils as utils
-from mrcnn import visualize
-import mrcnn.model as modellib
+sys.path.append(ROOT_DIR)
 
 # Directory to save logs and trained model
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
@@ -47,6 +48,7 @@ COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 # if not os.path.exists(COCO_MODEL_PATH):
 #     utils.download_trained_weights(COCO_MODEL_PATH)
 
+
 class CocoSynthConfig(Config):
     def __init__(self, num_classes):
         self.NUM_CLASSES = num_classes
@@ -55,42 +57,42 @@ class CocoSynthConfig(Config):
     Derives from the base Config class and overrides specific values.
     """
     # Give the configuration a recognizable name
-    NAME = "cocosynth_dataset"
+    NAME = "myVision"
 
     # Train on 1 GPU and 1 image per GPU. Batch size is 1 (GPUs * images/GPU).
-    GPU_COUNT = 1
-    IMAGES_PER_GPU = 4
+    # GPU_COUNT = 1
+    # IMAGES_PER_GPU = 4
 
     # Number of classes (including background)
     # NUM_CLASSES = num_classes
 
     # All of our training images are 512x512
-    IMAGE_MIN_DIM = 512
-    IMAGE_MAX_DIM = 512
+    # IMAGE_MIN_DIM = 1024
+    # IMAGE_MAX_DIM = 512
 
     # You can experiment with this number to see if it improves training
-    STEPS_PER_EPOCH = 200
+    STEPS_PER_EPOCH = 400
 
     # This is how often validation is run. If you are using too much hard drive space
     # on saved models (in the MODEL_DIR), try making this value larger.
-    VALIDATION_STEPS = 10
-    
+    VALIDATION_STEPS = 20
+
     # Matterport originally used resnet101, but I downsized to fit it on my graphics card
-    BACKBONE = 'resnet101'
+    # BACKBONE = 'resnet101'
 
     # To be honest, I haven't taken the time to figure out what these do
-    RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)
-    TRAIN_ROIS_PER_IMAGE = 32
-    MAX_GT_INSTANCES = 50 
-    POST_NMS_ROIS_INFERENCE = 500 
-    POST_NMS_ROIS_TRAINING = 1000 
-    
+    # RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)
+    # TRAIN_ROIS_PER_IMAGE = 32
+    # MAX_GT_INSTANCES = 50
+    # POST_NMS_ROIS_INFERENCE = 500
+    # POST_NMS_ROIS_TRAINING = 1000
 
 
 class CocoLikeDataset(utils.Dataset):
     """ Generates a COCO-like dataset, i.e. an image dataset annotated in the style of the COCO dataset.
         See http://cocodataset.org/#home for more information.
     """
+
     def load_data(self, annotation_json, images_dir):
         """ Load the coco-like dataset from json
         Args:
@@ -101,18 +103,19 @@ class CocoLikeDataset(utils.Dataset):
         json_file = open(annotation_json)
         coco_json = json.load(json_file)
         json_file.close()
-        
+
         # Add the class names using the base method from utils.Dataset
         source_name = "coco_like"
         for category in coco_json['categories']:
             class_id = category['id']
             class_name = category['name']
             if class_id < 1:
-                print('Error: Class id for "{}" cannot be less than one. (0 is reserved for the background)'.format(class_name))
+                print('Error: Class id for "{}" cannot be less than one. (0 is reserved for the background)'.format(
+                    class_name))
                 return
-            
+
             self.add_class(source_name, class_id, class_name)
-        
+
         # Get all annotations
         annotations = {}
         for annotation in coco_json['annotations']:
@@ -120,7 +123,7 @@ class CocoLikeDataset(utils.Dataset):
             if image_id not in annotations:
                 annotations[image_id] = []
             annotations[image_id].append(annotation)
-        
+
         # Get all images and add them to the dataset
         seen_images = {}
         for image in coco_json['images']:
@@ -134,11 +137,13 @@ class CocoLikeDataset(utils.Dataset):
                     image_width = image['width']
                     image_height = image['height']
                 except KeyError as key:
-                    print("Warning: Skipping image (id: {}) with missing key: {}".format(image_id, key))
-                
-                image_path = os.path.abspath(os.path.join(images_dir, image_file_name))
+                    print("Warning: Skipping image (id: {}) with missing key: {}".format(
+                        image_id, key))
+
+                image_path = os.path.abspath(
+                    os.path.join(images_dir, image_file_name))
                 image_annotations = annotations[image_id]
-                
+
                 # Add the image using the base method from utils.Dataset
                 self.add_image(
                     source=source_name,
@@ -148,7 +153,7 @@ class CocoLikeDataset(utils.Dataset):
                     height=image_height,
                     annotations=image_annotations
                 )
-                
+
     def load_mask(self, image_id):
         """ Load instance masks for the given image.
         MaskRCNN expects masks in the form of a bitmap [height, width, instances].
@@ -163,7 +168,7 @@ class CocoLikeDataset(utils.Dataset):
         annotations = image_info['annotations']
         instance_masks = []
         class_ids = []
-        
+
         for annotation in annotations:
             class_id = annotation['category_id']
             mask = Image.new('1', (image_info['width'], image_info['height']))
@@ -176,29 +181,28 @@ class CocoLikeDataset(utils.Dataset):
 
         mask = np.dstack(instance_masks)
         class_ids = np.array(class_ids, dtype=np.int32)
-        
+
         return mask, class_ids
 
 
 def train(model):
-    
     """Train the model."""
-        
+
     # Validation dataset
     dataset_val = CocoLikeDataset()
-    dataset_val.load_data(os.path.join(ROOT_DIR,'datasets/ikea_drill_screw/val/coco_instances.json'),
-                      os.path.join(ROOT_DIR, 'datasets/ikea_drill_screw/val/images'))
+    dataset_val.load_data(os.path.join(ROOT_DIR, 'datasets/ikea_drill_screw/val/coco_instances.json'),
+                          os.path.join(ROOT_DIR, 'datasets/ikea_drill_screw/val/images'))
     dataset_val.prepare()
     # Image Augmentation
-        # Right/Left flip 50% of the time
-    augmentation = imgaug.augmenters.Fliplr(0.5)
-    # ,augmentation = imgaug.augmenters.Sometimes(0.5, [
-                #     imgaug.augmenters.Fliplr(0.5),
-                #     imgaug.augmenters.Flipud(0.5),
-                #     imgaug.augmenters.GaussianBlur(sigma=(0.0, 5.0))
-                # ])
+    # Right/Left flip 50% of the time
+    # augmentation = imgaug.augmenters.Fliplr(0.5)
+    augmentation = imgaug.augmenters.Sometimes(0.5, [
+        imgaug.augmenters.Fliplr(0.5),
+        imgaug.augmenters.Flipud(0.5),
+        imgaug.augmenters.GaussianBlur(sigma=(0.0, 5.0))
+    ])
     model = modellib.MaskRCNN(mode="training", config=config,
-                                  model_dir=args.logs)
+                              model_dir=args.logs)
     # *** This training schedule is an example. Update to your needs ***
     # Since we're using a very small dataset, and starting from
     # COCO trained weights, we don't need to train too long. Also,
@@ -211,24 +215,24 @@ def train(model):
                 epochs=40,
                 layers='heads',
                 augmentation=augmentation)
-    
+
     # Training - Stage 2
     # Finetune layers from ResNet stage 4 and up
     print("Fine tune Resnet stage 4 and up")
     model.train(dataset_train, dataset_val,
-                    learning_rate=config.LEARNING_RATE,
-                    epochs=60,
-                    layers='4+',
-                    augmentation=augmentation)
+                learning_rate=config.LEARNING_RATE,
+                epochs=60,
+                layers='4+',
+                augmentation=augmentation)
 
     # Training - Stage 3
     # Fine tune all layers
     print("Fine tune all layers")
     model.train(dataset_train, dataset_val,
-                    learning_rate=config.LEARNING_RATE / 10,
-                    epochs=80,
-                    layers='all',
-                    augmentation=augmentation)
+                learning_rate=config.LEARNING_RATE / 10,
+                epochs=80,
+                layers='all',
+                augmentation=augmentation)
 
 
 ############################################################
@@ -265,14 +269,14 @@ if __name__ == '__main__':
                         metavar="Layers to train",
                         help="'heads' or 'all'")
     args = parser.parse_args()
-    
+
     # Validate arguments
     if args.command == "train":
         assert args.dataset, "Argument --dataset is required for training"
         layers2train = args.layers2train.lower()
     elif args.command == "splash":
         assert args.image or args.video,\
-               "Provide --image or --video to apply color splash"
+            "Provide --image or --video to apply color splash"
 
     print("Weights: ", args.weights)
     print("Dataset: ", args.dataset)
@@ -284,7 +288,7 @@ if __name__ == '__main__':
         # Training dataset.
         dataset_train = CocoLikeDataset()
         dataset_train.load_data(os.path.join(ROOT_DIR, "datasets/ikea_drill_screw/train/coco_instances.json"),
-                            os.path.join(ROOT_DIR, "datasets/ikea_drill_screw/train/images"))
+                                os.path.join(ROOT_DIR, "datasets/ikea_drill_screw/train/images"))
         dataset_train.prepare()
 
         config = CocoSynthConfig(len(dataset_train.class_names))
