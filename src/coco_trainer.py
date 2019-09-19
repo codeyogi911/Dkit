@@ -205,19 +205,19 @@ def train(model):
     # no need to train all layers, just the heads should do it.
 
     # Training - Stage 1
-    # print("Training network heads")
-    # model.train(dataset_train, dataset_val,
-    #             learning_rate=config.LEARNING_RATE,
-    #             epochs=40,
-    #             layers='heads',
-    #             augmentation=augmentation)
+    print("Training network heads")
+    model.train(dataset_train, dataset_val,
+                learning_rate=config.LEARNING_RATE,
+                epochs=40,
+                layers='heads',
+                augmentation=augmentation)
     
     # Training - Stage 2
     # Finetune layers from ResNet stage 4 and up
     print("Fine tune Resnet stage 4 and up")
     model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE,
-                    epochs=30,
+                    epochs=60,
                     layers='4+',
                     augmentation=augmentation)
 
@@ -226,7 +226,7 @@ def train(model):
     print("Fine tune all layers")
     model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE / 10,
-                    epochs=60,
+                    epochs=80,
                     layers='all',
                     augmentation=augmentation)
 
